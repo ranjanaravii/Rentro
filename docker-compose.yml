@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # Database Services
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: rentro_db
+      POSTGRES_USER: rentro_user
+      POSTGRES_PASSWORD: rentro_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rentro-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - rentro-network
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+      - property-service
+      - booking-service
+      - notification-service
+    networks:
+      - rentro-network
+
+  # Microservices
+  user-service:
+    build: ./user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks:
+      - rentro-network
+
+  property-service:
+    build: ./property-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks:
+      - rentro-network
+
+  booking-service:
+    build: ./booking-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks:
+      - rentro-network
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks:
+      - rentro-network
+
+  society-service:
+    build: ./society-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    networks:
+      - rentro-network
+
+volumes:
+  postgres_data:
+
+networks:
+  rentro-network:
+    driver: bridge

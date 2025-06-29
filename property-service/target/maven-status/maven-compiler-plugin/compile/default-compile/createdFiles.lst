@@ -1,0 +1,5 @@
+com/rentro/property/PropertyServiceApplication.class
+com/rentro/property/entity/Property$FurnishingStatus.class
+com/rentro/property/entity/Property$PropertyType.class
+com/rentro/property/entity/Property$PreferredTenantType.class
+com/rentro/property/entity/Property.class
